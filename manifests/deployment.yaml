@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kserve-ds-cloud-test
+  labels:
+    app: kserve-ds-cloud-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kserve-ds-cloud-test
+  template:
+    metadata:
+      labels:
+        app: kserve-ds-cloud-test
+    spec:
+      containers:
+        - name: webapp
+          image: t041lk8/ds-cloud-test:v0.1.0
+          imagePullPolicy: Always
+          resources: 
+            limits:
+              cpu: 4
+              memory: 2Gi
+            requests:
+              cpu: 2
+              memory: 1.5Gi
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /v1/models/NERtagger
+              port: http
+            initialDelaySeconds: 60 # Долгое скачивание модели
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /v1/models/NERtagger
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 15

@@ -134,3 +134,4 @@ start.sh
 model/
 notebooks/cls.ipynb
 notebooks/ner.ipynb
+data

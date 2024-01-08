@@ -1,35 +1,12 @@
-version: '2.0'
-services:
+version: '3.8'
 
+services:
   kserve:
-    build: ./kserve
+    container_name: kserve
+    build: 
+      context: ./app
     ports:
       - 8080:8080
     volumes:
-      - ./model/NERtagger/:/app/model/NERtagger
-    container_name: kserve
-    command: 'python app.py'
-
-  jupyter:
-    build: ./jupyter
-    ports:
-    - 8888:8888
-    - 5151:5151
-    volumes:
-      - ./notebooks/:/app/notebooks
-    container_name: jupyter
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-
-  tensorboard:
-    build: ./tensorboard
-    ports:
-    - 6006:6006
-    volumes:
-      - ./model/:/app/model
-    container_name: tensorboard
+      - ./data/models/NERtagger:/app/NERtagger
+    
