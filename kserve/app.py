@@ -6,20 +6,15 @@ import torch
 from transformers import BertForTokenClassification, BertTokenizerFast
 
 unique_tags = {'B-LOC', 'B-ORG', 'B-PER', 'I-LOC', 'I-ORG', 'I-PER', 'O'}
-ids_to_labels = {0: 'I-PER',
-  1: 'I-LOC',
-  2: 'B-LOC',
-  3: 'B-PER',
-  4: 'B-ORG',
-  5: 'O',
-  6: 'I-ORG'}
-labels_to_ids = {'I-PER': 0,
-  'I-LOC': 1,
-  'B-LOC': 2,
-  'B-PER': 3,
-  'B-ORG': 4,
-  'O': 5,
-  'I-ORG': 6}
+ids_to_labels = {
+    0: 'B-PER',
+    1: 'O',
+    2: 'I-PER',
+    3: 'I-LOC',
+    4: 'B-ORG',
+    5: 'B-LOC',
+    6: 'I-ORG'
+}
 
 class MyModel(kserve.Model):
     def __init__(self, name: str):
@@ -31,11 +26,13 @@ class MyModel(kserve.Model):
 
     def get_prediction(self, tokens_preds, offset_mapping):
         entities = []
+        offset_mapping = offset_mapping.squeeze().tolist()
         ent_text=''
         ent_type=''
         cur_start = 0
-        cur_end = 0
-        for (token, pred), (start, stop) in zip(tokens_preds, offset_mapping.squeeze().tolist()):
+        cur_end = offset_mapping[0][1]
+        for (token, pred), (start, stop) in zip(tokens_preds, offset_mapping):
+            cur_end = stop
             if token.startswith("##"):
                 ent_text += token[2:]
                 cur_end = stop
