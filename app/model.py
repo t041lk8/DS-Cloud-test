@@ -1,9 +1,8 @@
-import json
-
-import kserve
-import numpy as np
 import torch
+import kserve
+
 from transformers import BertForTokenClassification, BertTokenizerFast
+
 
 unique_tags = {'B-LOC', 'B-ORG', 'B-PER', 'I-LOC', 'I-ORG', 'I-PER', 'O'}
 ids_to_labels = {
@@ -16,12 +15,13 @@ ids_to_labels = {
     6: 'I-ORG'
 }
 
+
 class MyModel(kserve.Model):
     def __init__(self, name: str):
         super().__init__(name)
         self.name = name
         self.ready = False
-        self.bert = BertForTokenClassification.from_pretrained('./model/NERtagger')
+        self.bert = BertForTokenClassification.from_pretrained('./NERtagger')
         self.tokenizer = BertTokenizerFast.from_pretrained('ai-forever/ruBert-base')
 
     def get_prediction(self, tokens_preds, offset_mapping):
@@ -73,9 +73,3 @@ class MyModel(kserve.Model):
         result = {'text': text, 'entities': entities}
 
         return result
-
-
-if __name__ == "__main__":
-    model = MyModel("NERtagger")
-    model.load()
-    kserve.ModelServer().start([model])
